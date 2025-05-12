@@ -1,0 +1,58 @@
+.card {
+  background-color: rgba(255, 255, 255, 0.05); /* 非常淡的背景，接近透明 */
+  border: 1.5px solid rgba(255, 255, 255, 0.7); /* 更明顯的白色邊框 */
+  border-radius: 15px; /* 調整圓角 */
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* 讓標題在底部 */
+  min-height: 200px; /* 增加卡片高度，使其更修長 */
+  width: 100%; /* 寬度由 grid 控制 */
+  box-sizing: border-box; /* 確保 padding 和 border 不會增加總寬高 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(3px); /* 輕微毛玻璃效果 */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* 添加平滑過渡 */
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.03); /* 滑鼠懸停時稍微上移放大 */
+  box-shadow: 0 8px 20px rgba(0, 174, 255, 0.3); /* 懸停時藍色陰影 */
+  border-color: rgba(0, 174, 255, 0.8); /* 懸停時邊框變藍 */
+}
+
+.card h5 {
+  margin: 0; /* 移除預設 margin */
+  margin-top: auto; /* 將標題推到底部 */
+  padding-top: 10px; /* 與上方圖案的間距 */
+  color: #e0e0e0; /* 淺灰色文字 */
+  font-size: 1rem; /* 調整字體大小 */
+  width: 100%; /* 讓文字下方可以加分隔線 */
+  text-align: center;
+  position: relative; /* 為了分隔線定位 */
+}
+
+/* 卡片文字上方的分隔線 (類似影片) */
+.card h5::before {
+  content: '';
+  position: absolute;
+  top: 0; /* 位於文字頂部 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%; /* 分隔線寬度 */
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.5); /* 分隔線顏色 */
+}
+
+/* 卡片圖案的佔位符 */
+.card-pattern-placeholder {
+  width: 90%; /* 調整寬度 */
+  height: 100px; /* 調整高度 */
+  border: 1px dashed rgba(255, 255, 255, 0.3); /* 示意邊框顏色調淡 */
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4); /* 佔位符文字顏色 */
+} 

@@ -1,0 +1,110 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%); /* 深藍紫色漸層 */
+  color: white; /* 整體文字顏色 */
+}
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-x: hidden; /* 防止水平滾動條 */
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  margin-bottom: 30px; /* 調整間距 */
+  max-width: 80%; /* 限制標題寬度，避免過長 */
+}
+
+.App-header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.2rem); /* 響應式字體大小 */
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #e0e0e0; /* 淺灰色標題 */
+}
+
+.App-header p {
+  font-size: clamp(0.9rem, 3vw, 1.1rem); /* 響應式字體大小 */
+  color: #c0c0c0; /* 稍暗的副標題 */
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 卡片容器 */
+.card-container {
+  display: grid; /* 使用 grid 佈局 */
+  grid-template-columns: repeat(2, 1fr); /* 2x2 網格 */
+  gap: 20px; /* 卡片之間的間距 */
+  padding: 20px;
+  width: 100%;
+  max-width: 450px; /* 調整最大寬度以適應 2x2 卡片 */
+  margin-bottom: 30px; /* 與下方選單的間距 */
+}
+
+/* 選中卡片的背景遮罩 */
+.card-selected-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* 加深背景遮罩 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer; 
+}
+
+/* 選中後放大的卡片樣式 */
+.card-selected-content {
+  background-color: transparent; /* 背景透明，依賴卡片本身的背景 */
+  border: 2px solid #00aeff; /* 明亮的藍色邊框 */
+  border-radius: 15px; /* 與 Card.css 的圓角一致 */
+  padding: 0; /* 移除 padding，讓 Card 組件的樣式完全控制內部 */
+  min-width: 200px; /* 調整最小寬度 */
+  max-width: 250px; /* 調整最大寬度 */
+  min-height: 300px; /* 調整最小高度 */
+  display: flex; /* 確保內容可以填滿 */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* 可能需要調整，看Card內部如何佈局 */
+  cursor: default;
+  box-shadow: 0 0 25px #00aeff, 0 0 10px #00aeff inset; /* 藍色光暈效果 */
+}
+
+/* 選中卡片內的關閉按鈕，可以先移除，因為影片中似乎沒有按鈕，而是點擊背景關閉 */
+.card-selected-content button {
+ display: none; /* 暫時隱藏關閉按鈕 */
+}
