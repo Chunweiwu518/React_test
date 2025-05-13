@@ -1,73 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-// 引入我們即將創建的 Card 組件
-// import Card from './Card'; 
-// 引入 framer-motion
-import { motion, AnimatePresence } from 'framer-motion';
+import Card from './components/Card';
+import ListView from './components/ListView';
+import { ReactComponent as CardSvg } from './assets/2606149_5629.svg'; // 作為 React 組件導入
 
-// 模擬卡片數據 (之後可以替換成真實內容)
-const cardData = [
-  { id: 1, title: '毅力' },
-  { id: 2, title: '樂觀' },
-  { id: 3, title: '積極' },
-  { id: 4, title: '執著' },
+// imageUrl 現在傳遞的是組件本身
+const initialCardsData = [
+  { id: 1, title: '毅力', ImageComponent: CardSvg },
+  { id: 2, title: '樂觀', ImageComponent: CardSvg },
+  { id: 3, title: '積極', ImageComponent: CardSvg },
+  { id: 4, title: '韌性', ImageComponent: CardSvg },
 ];
 
 function App() {
-  // selectedId 狀態用來追蹤被選中的卡片 ID，null 代表沒有卡片被選中
-  const [selectedId, setSelectedId] = useState(null);
+  const [cards, setCards] = useState([]);
+  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [visibleCardIds, setVisibleCardIds] = useState([]);
+  const [currentView, setCurrentView] = useState('cards'); // 'cards' or 'list'
+  const cardContainerRef = useRef(null); // Ref for the card container
+  const [isTransitioningView, setIsTransitioningView] = useState(false); // New state to prevent race conditions
 
-  // 根據 selectedId 找到被選中的卡片數據
-  const selectedCard = cardData.find(card => card.id === selectedId);
+  useEffect(() => {
+    const firstCardDelay = 50; // 第一張卡觸發延遲
+    const otherCardsDelay = 250; // 其他三張卡觸發延遲 (50ms + 200ms)
+    
+    setCards(initialCardsData);
+    const timeouts = [];
+
+    // 觸發第一張卡 (假設 id 為 1 或 index 為 0 的卡)
+    if (initialCardsData.length > 0) {
+      const firstCardId = initialCardsData[0].id;
+      timeouts.push(setTimeout(() => {
+        setVisibleCardIds(prev => [...prev, firstCardId]);
+      }, firstCardDelay));
+    }
+
+    // 觸發其他卡
+    const otherCardIds = initialCardsData.slice(1).map(card => card.id);
+    if (otherCardIds.length > 0) {
+      timeouts.push(setTimeout(() => {
+        setVisibleCardIds(prev => [...prev, ...otherCardIds]);
+      }, otherCardsDelay));
+    }
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
+
+  const handleCardClick = (cardId) => {
+    if (isTransitioningView) return;
+    if (selectedCardId === null) {
+      setSelectedCardId(cardId);
+    } else if (selectedCardId === cardId) {
+      setSelectedCardId(null);
+    }
+  };
+
+  // *** TEMPORARY TEST: Trigger view change directly on selectedCardId change ***
+  useEffect(() => {
+    let viewChangeTimeoutId = null;
+
+    const triggerViewChange = () => {
+      if (isTransitioningView) return;
+      setIsTransitioningView(true);
+      console.log('App.js (Test): Starting delay before view change...');
+      viewChangeTimeoutId = setTimeout(() => {
+        console.log('App.js (Test): Delay finished, changing view to list.');
+        // Ensure card is still selected before changing view
+        if (selectedCardId !== null) { 
+           setCurrentView('list');
+        }
+        setIsTransitioningView(false);
+      }, 500); // Keep the 500ms delay for now
+    };
+
+    // If a card is selected and we are in cards view, trigger the change sequence
+    if (selectedCardId !== null && currentView === 'cards' && !isTransitioningView) {
+        console.log("App.js (Test): Card selected, triggering view change sequence.");
+        triggerViewChange();
+    }
+    
+    // Cleanup the timeout if the component unmounts or dependencies change
+    return () => {
+        clearTimeout(viewChangeTimeoutId);
+        // Reset transitioning flag if effect cleans up before view change completes
+        // This might happen if user quickly clicks back or another card
+        if (isTransitioningView) {
+           // We might need a more robust way if quick back-clicks cause issues
+           // For now, let's assume the 500ms completes or gets cleared.
+        }
+    };
+
+  }, [selectedCardId, currentView, isTransitioningView]); // Dependencies remain
+
+  const handleBackToList = () => {
+    setSelectedCardId(null);
+    setCurrentView('cards');
+    setIsTransitioningView(false);
+  };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>歡迎進駐 匠心幾何世界</h1>
-        <p>靜下心，抽取專屬心靈卡牌</p>
-      </header>
-      
-      {/* 卡片容器 */}
-      <motion.div className="card-container">
-        {cardData.map(card => (
-          // 之後會用真實的 Card 組件替換 motion.div
-          <motion.div
-            key={card.id}
-            className="card-placeholder" // 暫時使用 placeholder 樣式
-            layoutId={`card-container-${card.id}`} // 為了佈局動畫
-            onClick={() => setSelectedId(card.id)} // 點擊時設置 selectedId
-            style={{ cursor: 'pointer' }} // 提示可以點擊
-          >
-            <motion.h5>{card.title}</motion.h5>
-            {/* 這裡可以放卡片圖案的 SVG 或佔位符 */}
-          </motion.div>
-        ))}
-      </motion.div>
+      <div className="App-header">
+        {/* Conditionally render title based on view? Or keep it static? */}
+        {currentView === 'cards' && <h1>動畫效果展示</h1>}
+        {/* We might need a different header/title for the list view */} 
+      </div>
 
-      {/* 使用 AnimatePresence 來處理選中卡片出現/消失的動畫 */}
-      <AnimatePresence>
-        {selectedId && selectedCard && (
-          // 當有卡片被選中時，顯示放大的卡片視圖 (modal)
-          <motion.div
-            className="card-selected-backdrop" // 背景遮罩
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedId(null)} // 點擊背景關閉
-          >
-            <motion.div
-              className="card-selected-content" // 放大的卡片容器
-              layoutId={`card-container-${selectedId}`} // 與列表中的卡片對應
-              // 防止點擊卡片內容本身也觸發背景的關閉事件
-              onClick={(e) => e.stopPropagation()} 
-            >
-              <motion.h2>{selectedCard.title}</motion.h2>
-              {/* 這裡可以放更詳細的內容或動畫 */}
-              <motion.button onClick={() => setSelectedId(null)}>關閉</motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {currentView === 'cards' && (
+          <div ref={cardContainerRef} className={`card-container ${selectedCardId ? 'center-mode' : ''}`}>
+            {cards.map((card, index) => (
+              <div
+                key={card.id}
+                className={`
+                  card-wrapper 
+                  initial-pos-${index % 4} 
+                  ${visibleCardIds.includes(card.id) ? 'visible' : ''} 
+                  ${selectedCardId === card.id ? 'contains-selected' : ''}
+                  ${index === 0 ? 'is-first' : ''}
+                `}
+              >
+                <Card
+                  id={card.id}
+                  title={card.title}
+                  ImageComponent={card.ImageComponent}
+                  isSelected={selectedCardId === card.id}
+                  onClick={handleCardClick} // Pass the updated handler
+                  isVisible={visibleCardIds.includes(card.id)}
+                />
+              </div>
+            ))}
+          </div>
+      )}
+
+      {currentView === 'list' && (
+          <ListView onBack={handleBackToList} />
+      )}
+
     </div>
   );
 }

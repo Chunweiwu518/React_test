@@ -1,0 +1,206 @@
+/* src/components/ListView.css */
+
+.list-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  /* Start hidden for entry animation */
+  opacity: 0; 
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* Renamed phase-initial to phase-entry for clarity */
+.list-view-container.phase-entry,
+.list-view-container.phase-banner-visible,
+.list-view-container.phase-list-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Logo Styles */
+.list-header-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px; /* Space below logo */
+  opacity: 0;
+  animation: fadeInLogo 0.5s ease-out 0.2s forwards; /* Fade in after container */
+}
+
+@keyframes fadeInLogo {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 5px;
+}
+
+.logo-text-main {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+}
+
+.logo-text-sub {
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+/* Prompt Text Styles */
+.initial-prompt-text {
+  color: #e0e0e0;
+  font-size: clamp(1rem, 4vw, 1.3rem); /* Slightly smaller max size */
+  margin-bottom: 25px; /* Increased margin */
+  text-align: center;
+  line-height: 1.5; /* Added line-height */
+  transition: opacity 0.5s ease-out;
+}
+
+.list-banner {
+  border: 1px solid rgba(255, 255, 255, 0.6); /* Slightly less transparent border */
+  border-radius: 35px; /* Even more rounded capsule */
+  background-color: rgba(0, 0, 0, 0.15); /* Slightly less dark */
+  /* backdrop-filter: blur(5px); */ /* Removing blur for now, check screenshot */
+  padding: 0 25px; /* Wider padding */
+  width: 100%;
+  max-width: 400px; /* Wider max-width */
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  height: 70px; /* Adjusted initial height */
+  opacity: 0;
+  transform: scaleY(0.8);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.4s ease-out 0.4s, /* Delay opacity fade-in */
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s, 
+              border-radius 0.6s ease-in-out;
+}
+
+.list-banner.phase-banner-visible,
+.list-banner.phase-list-visible {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.list-banner.phase-list-visible {
+  height: auto; 
+  min-height: 280px; /* Set a min-height for the expanded list */
+  border-radius: 20px; /* Less rounded when expanded */
+}
+
+/* Horizontal line decoration - adjust appearance */
+.list-banner::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 30px;
+    right: 30px;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3); /* Lighter line */
+    transform: translateY(-50%) scaleX(0);
+    transition: transform 0.5s ease-in-out 0.6s, opacity 0.2s ease-out; /* Adjust timing */
+    opacity: 0;
+}
+
+.list-banner.phase-banner-visible::before,
+.list-banner.phase-list-visible::before {
+    transform: translateY(-50%) scaleX(1);
+    opacity: 1;
+}
+
+/* Hide line when list is visible */
+.list-banner.phase-list-visible::before {
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+/* Content Wrapper */
+.list-content-wrapper {
+    opacity: 0;
+    transition: opacity 0.5s ease-out 0.3s; /* Adjust fade-in timing */
+    padding: 10px 0; /* Reduced vertical padding */
+}
+
+.list-banner.phase-list-visible .list-content-wrapper {
+    opacity: 1;
+}
+
+/* List Title Styles */
+.list-title {
+  font-size: 0.65em; /* Smaller font size */
+  color: rgba(255, 255, 255, 0.5); /* More subtle color */
+  text-align: center;
+  margin-bottom: 10px; /* Reduced margin */
+  letter-spacing: 1.5px; /* Increased spacing */
+}
+
+.list-items {
+  /* No specific styles needed now, wrapper handles fade */
+}
+
+.list-item {
+  color: rgba(255, 255, 255, 0.8); /* Slightly dimmer text */
+  padding: 18px 10px; /* Increased padding */
+  border-top: 1px solid rgba(255, 255, 255, 0.15); /* More subtle border */
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, 
+              opacity 0.4s ease-out, 
+              transform 0.4s ease-out;
+  font-size: clamp(0.9rem, 3vw, 1.1rem); /* Slightly smaller font */
+  position: relative;
+  opacity: 0; 
+  transform: translateY(10px);
+}
+
+/* Apply fade-in style when list is visible */
+.list-banner.phase-list-visible .list-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.list-item:first-child {
+  border-top: none;
+}
+
+.list-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.list-item.selected {
+  color: #ffffff; /* Brighter text */
+  font-weight: 500;
+}
+
+/* Selected blue border - adjusted */
+.list-item.selected::before {
+  content: '';
+  position: absolute;
+  top: 8px; /* Adjust position */
+  left: 15px;
+  right: 15px;
+  bottom: 8px;
+  border: 1.5px solid #00bfff; /* Lighter blue, thinner border */
+  border-radius: 12px; /* Slightly different radius */
+  box-shadow: none; /* Remove box-shadow for cleaner look */
+  pointer-events: none; 
+  opacity: 0;
+  animation: fadeInBorderSelected 0.3s ease-out forwards;
+}
+
+/* Renamed animation for clarity */
+@keyframes fadeInBorderSelected {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+} 

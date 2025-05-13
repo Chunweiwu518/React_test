@@ -11,13 +11,12 @@ body {
 
 .App {
   text-align: center;
+  padding: 20px;
+  font-family: sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-x: hidden; /* 防止水平滾動條 */
 }
 
 .App-logo {
@@ -63,29 +62,119 @@ body {
 
 /* 卡片容器 */
 .card-container {
-  display: grid; /* 使用 grid 佈局 */
-  grid-template-columns: repeat(2, 1fr); /* 2x2 網格 */
-  gap: 20px; /* 卡片之間的間距 */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr)); /* 2x2 網格，最小寬度140px */
+  grid-template-rows: repeat(2, auto);
+  gap: 25px; /* 卡片間的間距 */
   padding: 20px;
   width: 100%;
-  max-width: 450px; /* 調整最大寬度以適應 2x2 卡片 */
-  margin-bottom: 30px; /* 與下方選單的間距 */
+  max-width: 400px; /* 容器最大寬度，影響卡片大小 */
+  margin-top: 50px;
+  perspective: 1000px;
+  position: relative;
+  min-height: 400px; /* 確保足夠空間 */
 }
 
-/* 選中卡片的背景遮罩 */
+/* 卡片進場動畫的容器樣式 */
+.card-wrapper {
+  opacity: 0;
+  transition-property: transform, opacity;
+  /* 默認動畫時間調整為 2.6s */
+  transition-duration: 2.6s; 
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+/* 第一張卡動畫時間仍為 2.8s */
+.card-wrapper.is-first {
+  transition-duration: 2.8s;
+}
+
+/* 卡片從中等距離進場，移除 transition-delay */
+.card-wrapper.initial-pos-0 { /* 左上 */
+  transform: translate(-120px, -120px) scale(0.5) rotateZ(0deg);
+}
+.card-wrapper.initial-pos-1 { /* 右上 */
+  transform: translate(120px, -120px) scale(0.5) rotateZ(0deg);
+}
+.card-wrapper.initial-pos-2 { /* 左下 */
+  transform: translate(-120px, 120px) scale(0.5) rotateZ(0deg);
+}
+.card-wrapper.initial-pos-3 { /* 右下 */
+  transform: translate(120px, 120px) scale(0.5) rotateZ(0deg);
+}
+
+.card-wrapper.visible {
+  opacity: 1;
+  transform: translate(0, 0) scale(1) rotateZ(0deg);
+}
+
+/* 選中卡片到中央的樣式 */
+.card-container.center-mode {
+  /* When a card is selected, the container itself might not need changes,
+     but it provides context for the children. */
+}
+
+.card-container.center-mode .card-wrapper:not(.contains-selected) {
+  opacity: 0; /* 未選中的卡片完全透明 */
+  transform: scale(0.85);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Remove old centering rule for .card inside .card-wrapper.contains-selected */
+/*
+.card-container.center-mode .card-wrapper.contains-selected .card {
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.15); 
+  opacity: 1;
+  z-index: 100;
+  pointer-events: auto;
+  width: 200px; 
+  box-shadow: 0 0 30px rgba(0, 174, 255, 0.8), 0 0 15px rgba(0, 174, 255, 0.6) inset;
+}
+*/
+
+/* NEW RULE: Apply centering and scaling to the card-wrapper itself when selected */
+.card-container.center-mode .card-wrapper.contains-selected {
+  position: fixed; /* Use fixed positioning for the wrapper */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.15); /* Center and scale the wrapper */
+  opacity: 1; /* Ensure it's fully visible */
+  z-index: 100; /* Bring to front */
+  pointer-events: auto; /* Allow clicks on the selected card */
+  /* Define width and height for the wrapper if necessary, or let the card inside define it */
+  /* For example, if Card component has fixed dimensions */
+  /* width: 200px; */ 
+  transition-property: transform, opacity; /* Explicitly define transitioned properties */
+  /* transition-property: transform, opacity, top, left; /* Add top, left to transition if they are not instant */
+  transition-duration: 0.4s; /* Match other transitions or define as needed */
+  transition-timing-function: ease-out;
+}
+
+/* Remove or comment out the backdrop styles */
+/*
 .card-selected-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.85); /* 加深背景遮罩 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  cursor: pointer; 
+  background-color: rgba(0, 0, 0, 0.7); 
+  z-index: 50; 
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
 }
+
+.card-selected-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto; 
+}
+*/
 
 /* 選中後放大的卡片樣式 */
 .card-selected-content {

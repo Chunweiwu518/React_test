@@ -1,0 +1,145 @@
+/* src/components/Card.css */
+.card {
+  /* 框架樣式 */
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 提高預設邊框透明度 */
+  border-radius: 15px;
+  width: 100%; /* 卡片填滿 wrapper */
+  aspect-ratio: 2 / 3; /* 保持高寬比 */
+  margin: 0; /* wrapper 會處理間距 */
+  padding: 15px; /* 稍微調整 padding */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column; /* 改為縱向排列 */
+  justify-content: space-between; /* 內容上下分布 */
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.2); /* 深色半透明背景 */
+  backdrop-filter: blur(5px); /* 毛玻璃效果 (如果瀏覽器支持) */
+  position: relative;
+  overflow: visible; /* Allow title to overflow */
+  padding-bottom: 25px; /* Add space at bottom */
+
+  /* 進場動畫 - 卡片本身 */
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  /* 卡片本身在 wrapper 動畫開始後 0.3s 才開始顯示 */
+  transition: opacity 0.5s ease-out 0.3s,
+              transform 0.5s ease-out 0.3s,
+              background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-wrapper.visible .card {
+  opacity: 1;
+  transform: translateY(0px) scale(1);
+}
+
+.card.selected {
+  /* 之前的樣式可能包含 background-color, border-color, box-shadow */
+  background-color: rgba(0, 100, 150, 0.15); /* 背景稍微變藍，保持透明 */
+  border-color: #00d4ff; /* 更明亮的藍色邊框 */
+  /* 嘗試更集中的輝光 */
+  box-shadow: 0 0 25px rgba(0, 204, 255, 0.9), 
+              0 0 15px rgba(0, 204, 255, 0.7) inset; /* 添加內陰影增強立體感 */
+}
+
+.card-content {
+  /* 因為 card 使用 flex, 這層可能不需要特別樣式 */
+  width: 100%; /* 確保內容寬度 */
+}
+
+.card-title {
+  /* --- Positioning --- */
+  position: absolute;
+  bottom: -12px; /* Position slightly below */
+  left: 50%;
+  /* transform: translateX(-50%); /* Combined below */
+
+  /* --- Sizing & Appearance --- */
+  width: 115%; /* Wider than the card */
+  font-size: clamp(1.1em, 3vw, 1.3em);
+  color: rgba(255, 255, 255, 0.95); /* 提高預設文字透明度 */
+  font-weight: 400;
+  padding: 6px 15px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+
+  /* --- Animation --- */
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px); /* Initial state: centered, slightly down */
+  transition: opacity 0.5s ease-in 0.6s,
+              border-color 1.0s ease-in 0.8s,
+              transform 0.5s ease-in 0.6s;
+}
+
+.card-wrapper.visible .card .card-title {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 1);
+  transform: translateX(-50%) translateY(0px); /* Final state: centered, at position */
+  /* 添加 transition for properties changed on select */
+  transition: opacity 0.5s ease-in 0.6s,
+              border-color 1.0s ease-in 0.8s, /* Keep existing */
+              transform 0.5s ease-in 0.6s, /* Keep existing */
+              color 0.3s ease, /* Add transition for color */
+              box-shadow 0.3s ease; /* Add transition for potential shadow */
+}
+
+/* Style for selected card's title */
+.card.selected .card-title {
+  color: #ffffff; /* 確保文字是純白 */
+  font-weight: 600; /* 加粗文字 */
+  border-color: #00d4ff; /* 邊框也發亮，與卡片一致 */
+  /* Optional: add subtle glow to title border */
+  box-shadow: 0 0 10px rgba(0, 204, 255, 0.7); /* 稍微增強標題光暈 */
+}
+
+/* 移除 .card-image, .card-description, .card-enter-active 相關樣式 */
+
+.card-image {
+  display: block;
+  max-width: 90%;
+  height: 60%;
+  object-fit: contain;
+  margin-bottom: 10px;
+  opacity: 1;
+}
+
+.card-image svg { 
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* Initially hidden */
+  transition: opacity 0.5s ease-out; /* Smooth fade-in when drawing starts */
+  /* background-color: rgba(255, 0, 0, 0.2); */ /* DEBUG: Remove red background */
+}
+
+/* --- SVG Specific Styles & Animation --- */
+.card-image svg path {
+  /* Styles are now defined in the SVG itself */
+  /* Vivus handles drawing, so no animation here */
+}
+
+/* REMOVE Keyframes */
+/* @keyframes draw-effect { ... } */
+
+.card-description {
+  font-size: 0.9em;
+  color: #555;
+  opacity: 0; /* 初始文字隱藏 */
+  transition: opacity 0.5s ease-in 0.3s; /* 延遲顯示 */
+}
+
+/* 動畫效果 */
+.card-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-enter-active .card-image,
+.card-enter-active .card-title,
+.card-enter-active .card-description {
+  opacity: 1;
+} 

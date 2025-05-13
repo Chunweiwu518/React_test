@@ -1,0 +1,55 @@
+/* src/components/Menu.css */
+.menu-container {
+  position: relative;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.menu-button {
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.menu-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.menu-list.open {
+  max-height: 200px; /* 根據內容調整 */
+}
+
+.menu-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  opacity: 0; /* 初始隱藏 */
+  transition: background-color 0.3s ease, color 0.3s ease, opacity 0.2s ease;
+}
+
+.menu-item.visible {
+  opacity: 1;
+}
+
+.menu-item:hover {
+  background-color: #f0f0f0;
+}
+
+.menu-item.selected {
+  background-color: dodgerblue;
+  color: white;
+  border: 1px solid navy; /* 框選效果 */
+  box-sizing: border-box; /* 包含邊框 */
+} 
