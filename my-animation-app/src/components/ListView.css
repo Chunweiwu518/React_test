@@ -21,70 +21,66 @@
   transform: translateY(0);
 }
 
-/* Logo Styles */
-.list-header-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px; /* Space below logo */
-  opacity: 0;
-  animation: fadeInLogo 0.5s ease-out 0.2s forwards; /* Fade in after container */
-}
-
-@keyframes fadeInLogo {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.logo-icon {
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 5px;
-}
-
-.logo-text-main {
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.9);
-  text-transform: uppercase;
-}
-
-.logo-text-sub {
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-}
-
-/* Prompt Text Styles */
 .initial-prompt-text {
   color: #e0e0e0;
-  font-size: clamp(1rem, 4vw, 1.3rem); /* Slightly smaller max size */
-  margin-bottom: 25px; /* Increased margin */
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  margin-bottom: 20px;
   text-align: center;
-  line-height: 1.5; /* Added line-height */
-  transition: opacity 0.5s ease-out;
+  /* TODO: Add animation if needed */
+  transition: opacity 0.5s ease-out; /* Allow fade-in */
 }
 
 .list-banner {
-  border: 1px solid rgba(255, 255, 255, 0.6); /* Slightly less transparent border */
-  border-radius: 35px; /* Even more rounded capsule */
-  background-color: rgba(0, 0, 0, 0.15); /* Slightly less dark */
-  /* backdrop-filter: blur(5px); */ /* Removing blur for now, check screenshot */
-  padding: 0 25px; /* Wider padding */
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 30px; /* More rounded like capsule */
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  padding: 0 20px; /* Adjust padding for height animation */
   width: 100%;
-  max-width: 400px; /* Wider max-width */
+  max-width: 350px;
   box-sizing: border-box;
-  overflow: hidden;
-  position: relative;
-  height: 70px; /* Adjusted initial height */
-  opacity: 0;
-  transform: scaleY(0.8);
+  overflow: visible; /* Changed from hidden to allow pseudo-elements to overflow */
+  position: relative; /* For pseudo-elements */
+
+  /* --- Animation States --- */
+  height: 60px; /* Initial capsule height */
+  opacity: 0;   /* Banner starts hidden */
+  transform: scaleY(0.8); /* Add subtle scale effect */
   transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity 0.4s ease-out 0.4s, /* Delay opacity fade-in */
-              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s, 
-              border-radius 0.6s ease-in-out;
+              opacity 0.4s ease-out 0.2s, /* Fade in slightly after container */
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+              border-radius 0.6s ease-in-out; /* Animate border radius */
+}
+
+/* Decorative elements for the sides of the banner */
+.list-banner::before,
+.list-banner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px; /* Width of the decorative element */
+  height: 40px; /* Height of the decorative element, should be less than banner height */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* Border color */
+  border-radius: 50%; /* Makes it an oval, or circle if width equals height */
+  opacity: 0; /* Initially hidden, will fade in with banner */
+  transition: opacity 0.4s ease-out 0.3s; /* Match banner fade-in delay */
+}
+
+.list-banner::before {
+  left: -10px; /* Position outside the banner on the left */
+}
+
+.list-banner::after {
+  right: -10px; /* Position outside the banner on the right */
+}
+
+/* Show decorative elements when banner is visible */
+.list-banner.phase-banner-visible::before,
+.list-banner.phase-banner-visible::after,
+.list-banner.phase-list-visible::before, /* Keep visible if list is also visible, adjust if needed */
+.list-banner.phase-list-visible::after {
+  opacity: 0.7; /* Adjust opacity as desired */
 }
 
 .list-banner.phase-banner-visible,
@@ -94,22 +90,24 @@
 }
 
 .list-banner.phase-list-visible {
-  height: auto; 
-  min-height: 280px; /* Set a min-height for the expanded list */
-  border-radius: 20px; /* Less rounded when expanded */
+  height: auto; /* Expand to content height */
+  /* Or calculate specific height if auto causes issues */
+  /* min-height: 250px; */ 
+  border-radius: 15px; /* Return to less rounded corners */
 }
 
-/* Horizontal line decoration - adjust appearance */
+/* Horizontal line decoration */
+/*
 .list-banner::before {
     content: '';
     position: absolute;
     top: 50%;
-    left: 30px;
-    right: 30px;
+    left: 25px;
+    right: 25px;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.3); /* Lighter line */
-    transform: translateY(-50%) scaleX(0);
-    transition: transform 0.5s ease-in-out 0.6s, opacity 0.2s ease-out; /* Adjust timing */
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%) scaleX(0); // Initially hidden
+    transition: transform 0.5s ease-in-out 0.3s; // Animate after banner appears
     opacity: 0;
 }
 
@@ -118,31 +116,33 @@
     transform: translateY(-50%) scaleX(1);
     opacity: 1;
 }
+*/
 
 /* Hide line when list is visible */
+/*
 .list-banner.phase-list-visible::before {
     opacity: 0;
     transition: opacity 0.2s ease-out;
 }
+*/
 
-/* Content Wrapper */
+/* Wrapper for fading content */
 .list-content-wrapper {
-    opacity: 0;
-    transition: opacity 0.5s ease-out 0.3s; /* Adjust fade-in timing */
-    padding: 10px 0; /* Reduced vertical padding */
+    opacity: 0; /* Content hidden initially */
+    transition: opacity 0.5s ease-out 0.2s; /* Fade in during list expansion */
+    padding: 15px 0; /* Restore vertical padding */
 }
 
 .list-banner.phase-list-visible .list-content-wrapper {
     opacity: 1;
 }
 
-/* List Title Styles */
 .list-title {
-  font-size: 0.65em; /* Smaller font size */
-  color: rgba(255, 255, 255, 0.5); /* More subtle color */
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  margin-bottom: 10px; /* Reduced margin */
-  letter-spacing: 1.5px; /* Increased spacing */
+  margin-bottom: 15px;
+  letter-spacing: 1px;
 }
 
 .list-items {
@@ -150,17 +150,17 @@
 }
 
 .list-item {
-  color: rgba(255, 255, 255, 0.8); /* Slightly dimmer text */
-  padding: 18px 10px; /* Increased padding */
-  border-top: 1px solid rgba(255, 255, 255, 0.15); /* More subtle border */
+  color: rgba(255, 255, 255, 0.9);
+  padding: 15px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   cursor: pointer;
   transition: background-color 0.2s ease, 
-              opacity 0.4s ease-out, 
-              transform 0.4s ease-out;
-  font-size: clamp(0.9rem, 3vw, 1.1rem); /* Slightly smaller font */
-  position: relative;
-  opacity: 0; 
+              opacity 0.4s ease-out, /* Add opacity transition */
+              transform 0.4s ease-out; /* Add transform transition */
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  position: relative; /* For the selected border */
+  opacity: 0; /* Start hidden for stagger animation */
   transform: translateY(10px);
 }
 
@@ -183,24 +183,24 @@
   font-weight: 500;
 }
 
-/* Selected blue border - adjusted */
+/* Blue selection border */
 .list-item.selected::before {
   content: '';
   position: absolute;
-  top: 8px; /* Adjust position */
-  left: 15px;
-  right: 15px;
-  bottom: 8px;
-  border: 1.5px solid #00bfff; /* Lighter blue, thinner border */
-  border-radius: 12px; /* Slightly different radius */
-  box-shadow: none; /* Remove box-shadow for cleaner look */
-  pointer-events: none; 
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border: 2px solid #00ccff; /* Match selected card glow */
+  border-radius: 10px; /* Rounded corners for the border */
+  box-shadow: 0 0 8px rgba(0, 204, 255, 0.5); /* Subtle glow */
+  pointer-events: none; /* Prevent border from interfering with clicks */
+  /* TODO: Animate this border */
   opacity: 0;
-  animation: fadeInBorderSelected 0.3s ease-out forwards;
+  animation: fadeInBorder 0.3s ease-out forwards;
 }
 
-/* Renamed animation for clarity */
-@keyframes fadeInBorderSelected {
+@keyframes fadeInBorder {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 } 

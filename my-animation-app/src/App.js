@@ -18,7 +18,6 @@ function App() {
   const [visibleCardIds, setVisibleCardIds] = useState([]);
   const [currentView, setCurrentView] = useState('cards'); // 'cards' or 'list'
   const cardContainerRef = useRef(null); // Ref for the card container
-  const [isTransitioningView, setIsTransitioningView] = useState(false); // New state to prevent race conditions
 
   useEffect(() => {
     const firstCardDelay = 50; // 第一張卡觸發延遲
@@ -49,55 +48,73 @@ function App() {
   }, []);
 
   const handleCardClick = (cardId) => {
-    if (isTransitioningView) return;
+    // Only allow selecting a card if none is currently selected
+    // Or allow clicking the selected card to deselect (will prevent view change)
     if (selectedCardId === null) {
-      setSelectedCardId(cardId);
+        setSelectedCardId(cardId);
     } else if (selectedCardId === cardId) {
-      setSelectedCardId(null);
+        setSelectedCardId(null); // Deselect
     }
+    // If a card is already selected, clicking another card does nothing for now
   };
 
-  // *** TEMPORARY TEST: Trigger view change directly on selectedCardId change ***
+  // Effect to handle view transition after centering animation
   useEffect(() => {
-    let viewChangeTimeoutId = null;
+    let timeoutId = null;
+    const cardWrapper = selectedCardId ? cardContainerRef.current?.querySelector('.card-wrapper.contains-selected') : null;
 
-    const triggerViewChange = () => {
-      if (isTransitioningView) return;
-      setIsTransitioningView(true);
-      console.log('App.js (Test): Starting delay before view change...');
-      viewChangeTimeoutId = setTimeout(() => {
-        console.log('App.js (Test): Delay finished, changing view to list.');
-        // Ensure card is still selected before changing view
-        if (selectedCardId !== null) { 
-           setCurrentView('list');
+    // Define the handler here so it can be added and removed with the same reference
+    const handleTransitionEnd = (event) => {
+      console.log(`App.js: transitionend event. Target: ${event.target.className}, Property: ${event.propertyName}, Current selectedCardId: ${selectedCardId}, currentView: ${currentView}`);
+      // Ensure the event is from the cardWrapper we are listening to, for the transform property,
+      // and we are still in 'cards' view with a card selected.
+      if (event.target === cardWrapper && event.propertyName.includes('transform') && selectedCardId !== null && currentView === 'cards') {
+        console.log('App.js: Correct transform transitionend condition met. Changing view to list.');
+        clearTimeout(timeoutId); // Clear the fallback timeout
+        setCurrentView('list');
+        // Manually remove listener to ensure it only acts once for this specific condition
+        if (cardWrapper) { // Check cardWrapper again before removing listener
+            cardWrapper.removeEventListener('transitionend', handleTransitionEnd);
         }
-        setIsTransitioningView(false);
-      }, 500); // Keep the 500ms delay for now
+      } else {
+        console.log('App.js: transitionend condition NOT met or view already changed.');
+      }
     };
 
-    // If a card is selected and we are in cards view, trigger the change sequence
-    if (selectedCardId !== null && currentView === 'cards' && !isTransitioningView) {
-        console.log("App.js (Test): Card selected, triggering view change sequence.");
-        triggerViewChange();
+    if (cardWrapper && currentView === 'cards') { 
+      console.log("App.js: Attaching transitionend listener to:", cardWrapper, "for selectedCardId:", selectedCardId);
+      cardWrapper.addEventListener('transitionend', handleTransitionEnd);
+
+      // Fallback timeout, slightly longer
+      timeoutId = setTimeout(() => {
+        if (selectedCardId !== null && currentView === 'cards') {
+          console.warn(`App.js: Fallback timeout for selectedCardId: ${selectedCardId}. Forcing view change.`);
+          setCurrentView('list');
+          if (cardWrapper) { // Clean up listener on fallback too
+            cardWrapper.removeEventListener('transitionend', handleTransitionEnd);
+          }
+        }
+      }, 4000); // Increased timeout to 4 seconds
+
+      return () => {
+        console.log("App.js: useEffect cleanup for selectedCardId:", selectedCardId, "- removing listener and timeout.");
+        if (cardWrapper) {
+            cardWrapper.removeEventListener('transitionend', handleTransitionEnd);
+        }
+        clearTimeout(timeoutId);
+      };
+    } else if (cardWrapper && currentView !== 'cards') {
+        console.log("App.js: View is not 'cards', ensuring listener is not active on", cardWrapper);
+        if (cardWrapper) { cardWrapper.removeEventListener('transitionend', handleTransitionEnd); }
+        clearTimeout(timeoutId); 
+    } else if (!cardWrapper) {
+        clearTimeout(timeoutId);
     }
-    
-    // Cleanup the timeout if the component unmounts or dependencies change
-    return () => {
-        clearTimeout(viewChangeTimeoutId);
-        // Reset transitioning flag if effect cleans up before view change completes
-        // This might happen if user quickly clicks back or another card
-        if (isTransitioningView) {
-           // We might need a more robust way if quick back-clicks cause issues
-           // For now, let's assume the 500ms completes or gets cleared.
-        }
-    };
-
-  }, [selectedCardId, currentView, isTransitioningView]); // Dependencies remain
+  }, [selectedCardId, currentView]);
 
   const handleBackToList = () => {
-    setSelectedCardId(null);
-    setCurrentView('cards');
-    setIsTransitioningView(false);
+      setSelectedCardId(null); // Deselect card
+      setCurrentView('cards'); // Switch view back to cards
   };
 
   return (
@@ -112,7 +129,7 @@ function App() {
           <div ref={cardContainerRef} className={`card-container ${selectedCardId ? 'center-mode' : ''}`}>
             {cards.map((card, index) => (
               <div
-                key={card.id}
+            key={card.id}
                 className={`
                   card-wrapper 
                   initial-pos-${index % 4} 

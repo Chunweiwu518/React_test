@@ -43,13 +43,6 @@ const ListView = ({ onBack }) => {
 
   return (
     <div className={`list-view-container phase-${animationPhase}`}>
-        <div className="list-header-logo">
-            {/* Placeholder for VACHERON CONSTANTIN GENEVE */}
-            <div className="logo-icon">✠</div>
-            <div className="logo-text-main">VACHERON CONSTANTIN</div>
-            <div className="logo-text-sub">GENEVE</div>
-        </div>
-
         {/* Initial text fades in with container */}
         <div className="initial-prompt-text">
             步行在異世界的走廊, 您想成為的樣貌是？
